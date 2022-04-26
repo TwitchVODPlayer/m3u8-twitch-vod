@@ -14,6 +14,14 @@
     "build": "tsc",
     "example": "node --experimental-fetch examples/index.mjs"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Dastan21/m3u8-twitch-vod"
+  },
+  "bugs": {
+    "url": "https://github.com/Dastan21/m3u8-twitch-vod/issues"
+  },
+  "homepage": "https://github.com/Dastan21/m3u8-twitch-vod#readme",
   "dependencies": {},
   "devDependencies": {
     "@types/node": "^17.0.24",
