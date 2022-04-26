@@ -1,0 +1,22 @@
+{
+  "name": "m3u8-twitch-vod",
+  "version": "1.0.0",
+  "description": "Get any Twitch VOD m3u8",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "author": "Dastan21",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc",
+    "example": "node --experimental-fetch examples/index.mjs"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "^17.0.24",
+    "typescript": "^4.6.3"
+  }
+}
