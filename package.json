@@ -1,6 +1,6 @@
 {
   "name": "m3u8-twitch-vod",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Get any Twitch VOD m3u8",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -9,10 +9,9 @@
     "dist"
   ],
   "author": "Dastan21",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "scripts": {
-    "build": "tsc",
-    "example": "node --experimental-fetch examples/index.mjs"
+    "build": "tsc"
   },
   "repository": {
     "type": "git",

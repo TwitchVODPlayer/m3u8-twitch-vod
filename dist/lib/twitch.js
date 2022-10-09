@@ -50,11 +50,6 @@ function getM3u8(vod_id) {
         if (!(content === null || content === void 0 ? void 0 : content.startsWith("#EXTM3U")))
             return getSubM3u8(vod_id); // sub-only
         return content;
-        // const m3u8_url = content.split('\n')[4]
-        // return {
-        //     content: content,
-        //     base_url: m3u8_url.replace(/index(.+)\.m3u8$/g, '')
-        // }
     });
 }
 exports.getM3u8 = getM3u8;

@@ -18,12 +18,12 @@ const M3U8_QUALITY = (quality: string, resolution: string, fps: number) => `#EXT
  * @param vod_id id of the VOD
  */
 export async function getVodInfos(vod_id: number): Promise<twitch.VODInfos> {
-    return fetch(`https://api.twitch.tv/kraken/videos/${vod_id}`, {
-        headers: {
-            "Accept": "application/vnd.twitchtv.v5+json",
-            "Client-ID": "kimne78kx3ncx6brgo4mv6wki5h1ko"
-        }
-    }).then(res => res.json())
+  return fetch(`https://api.twitch.tv/kraken/videos/${vod_id}`, {
+    headers: {
+      "Accept": "application/vnd.twitchtv.v5+json",
+      "Client-ID": "kimne78kx3ncx6brgo4mv6wki5h1ko"
+    }
+  }).then(res => res.json())
 }
 
 /**
@@ -31,17 +31,10 @@ export async function getVodInfos(vod_id: number): Promise<twitch.VODInfos> {
  * @param vod_id id of the vod
  */
 export async function getM3u8(vod_id: number): Promise<string> {
-    const access_token = await getAccessToken(vod_id)
-    const content = await getM3u8Content(`https://usher.ttvnw.net/vod/${vod_id}.m3u8`, access_token)
-
-    if (!content?.startsWith("#EXTM3U")) return getSubM3u8(vod_id) // sub-only
-
-    return content
-    // const m3u8_url = content.split('\n')[4]
-    // return {
-    //     content: content,
-    //     base_url: m3u8_url.replace(/index(.+)\.m3u8$/g, '')
-    // }
+  const access_token = await getAccessToken(vod_id)
+  const content = await getM3u8Content(`https://usher.ttvnw.net/vod/${vod_id}.m3u8`, access_token)
+  if (!content?.startsWith("#EXTM3U")) return getSubM3u8(vod_id) // sub-only
+  return content
 }
 
 /**
@@ -50,7 +43,7 @@ export async function getM3u8(vod_id: number): Promise<string> {
  * @param access_token
  */
 export async function getTsBuffer(url: string, access_token: twitch.AccessToken): Promise<Buffer> {
-    return fetch(prepareUrl(url, access_token), { headers: { "Content-Type": "arraybuffer" } }).then(res => res.arrayBuffer()).then(buf => Buffer.from(buf))
+  return fetch(prepareUrl(url, access_token), { headers: { "Content-Type": "arraybuffer" } }).then(res => res.arrayBuffer()).then(buf => Buffer.from(buf))
 }
 
 /**
@@ -58,23 +51,23 @@ export async function getTsBuffer(url: string, access_token: twitch.AccessToken)
  * @param vod_id id of the VOD
  */
 export async function getAccessToken(vod_id: number): Promise<twitch.AccessToken> {
-    return fetch("https://gql.twitch.tv/gql", {
-        method: "POST",
-        headers: {
-            "Content-Type": "text/plain;charset=UTF-8",
-            "Client-ID": "kimne78kx3ncx6brgo4mv6wki5h1ko"
-        },
-        body: '{"operationName":"PlaybackAccessToken","variables":{"isLive":false,"login":"","isVod":true,"vodID":"' + vod_id + '","playerType":"channel_home_live"},"extensions":{"persistedQuery":{"version":1,"sha256Hash":"0828119ded1c13477966434e15800ff57ddacf13ba1911c129dc2200705b0712"}}}'
+  return fetch("https://gql.twitch.tv/gql", {
+    method: "POST",
+    headers: {
+      "Content-Type": "text/plain;charset=UTF-8",
+      "Client-ID": "kimne78kx3ncx6brgo4mv6wki5h1ko"
+    },
+    body: '{"operationName":"PlaybackAccessToken","variables":{"isLive":false,"login":"","isVod":true,"vodID":"' + vod_id + '","playerType":"channel_home_live"},"extensions":{"persistedQuery":{"version":1,"sha256Hash":"0828119ded1c13477966434e15800ff57ddacf13ba1911c129dc2200705b0712"}}}'
+  })
+    .then(res => res.json())
+    .then(json => {
+      const token = json?.data?.videoPlaybackAccessToken
+      if (!token) throw new Error("Invalid VOD id")
+      return {
+        signature: token.signature,
+        value: token.value
+      }
     })
-        .then(res => res.json())
-        .then(json => {
-            const token = json?.data?.videoPlaybackAccessToken
-            if (!token) throw new Error("Invalid VOD id")
-            return {
-                signature: token.signature,
-                value: token.value
-            }
-        })
 }
 
 /**
@@ -83,7 +76,7 @@ export async function getAccessToken(vod_id: number): Promise<twitch.AccessToken
  * @param access_token
  */
 export async function getM3u8Content(url: string, access_token: twitch.AccessToken): Promise<string> {
-    return fetch(prepareUrl(url, access_token)).then(res => res.text()).then(res => res)
+  return fetch(prepareUrl(url, access_token)).then(res => res.text()).then(res => res)
 }
 
 /**
@@ -91,13 +84,9 @@ export async function getM3u8Content(url: string, access_token: twitch.AccessTok
  * @param vod_id
  */
 async function getSubM3u8(vod_id: number): Promise<string> {
-    const { seek_previews_url, resolutions, fps } = await getVodInfos(vod_id)
-    const base_url = seek_previews_url?.match(/^(https:\/\/.+)\/storyboards\/(.+)$/)?.[1] || ''
-    return `${M3U8_HEADER}${Object.entries(resolutions).map(([quality, resolution]) => `\n${M3U8_QUALITY(quality, resolution, fps[quality])}\n${base_url}/${quality}/index-dvr.m3u8`).join('')}`
-    // return {
-    //     content: `${M3U8_HEADER}${Object.entries(resolutions).map(([quality, resolution]) => `\n${M3U8_QUALITY(quality, resolution)}\n${base_url}/${quality}/index-dvr.m3u8`).join('')}`,
-    //     base_url: `${base_url}/`
-    // }
+  const { seek_previews_url, resolutions, fps } = await getVodInfos(vod_id)
+  const base_url = seek_previews_url?.match(/^(https:\/\/.+)\/storyboards\/(.+)$/)?.[1] || ''
+  return `${M3U8_HEADER}${Object.entries(resolutions).map(([quality, resolution]) => `\n${M3U8_QUALITY(quality, resolution, fps[quality])}\n${base_url}/${quality}/index-dvr.m3u8`).join('')}`
 }
 
 /**
@@ -106,14 +95,14 @@ async function getSubM3u8(vod_id: number): Promise<string> {
  * @param access_token
  */
 function prepareUrl(url: string, access_token: twitch.AccessToken): string {
-    const dom_url = new URL(url)
-    dom_url.search = new URLSearchParams({
-        sig: access_token.signature,
-        token: access_token.value,
-        allow_source: "true",
-        player: "twitchweb",
-        allow_spectre: "true",
-        allow_audio_only: "true"
-    }).toString()
-    return dom_url.toString()
+  const dom_url = new URL(url)
+  dom_url.search = new URLSearchParams({
+    sig: access_token.signature,
+    token: access_token.value,
+    allow_source: "true",
+    player: "twitchweb",
+    allow_spectre: "true",
+    allow_audio_only: "true"
+  }).toString()
+  return dom_url.toString()
 }
